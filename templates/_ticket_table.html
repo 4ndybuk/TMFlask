@@ -1,0 +1,67 @@
+<table class="table-modern">
+    <thead>
+        <tr>
+            <th>Ticket Name</th>
+            <th>Ticket ID</th>
+            <th>Type</th>
+            <th>Project</th>
+            <th>Urgency</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th>History</th>
+            <th>Created By</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for data in tickets %}
+        <tr>
+            <td>{{ data.ticket_name }}</td>
+            <td>{{ data.ticket_id }}</td>
+            <td>{{ data.type }}</td>
+            <td>{{ data.project }}</td>
+            <td>{{ data.urg }}</td>
+            <td>{{ data.location }}</td>
+            <td>
+                <form method="POST" action="{{ url_for('tickets.update_status', id=data.id) }}">
+                    {{ status_form.hidden_tag() }}
+                    {% if data.category == "Archived" %}
+                        <button disabled class="status-btn" style="color: grey;">DISABLED</button>
+                    {% elif data.status == "Active" %}
+                        {{ status_form.change_status(class_="status-btn btn-active", data_db_id=data.id, data_status=data.status, value=data.status) }}
+                    {% else %}
+                        {{ status_form.change_status(class_="status-btn btn-inactive", data_db_id=data.id, data_status=data.status, value=data.status) }}
+                    {% endif %}
+                </form>
+            </td>
+            <td>
+                <button type="button" class="btn-login view-btn"
+                data-db-id="{{ data.id }}"
+                data-ticket-id="{{ data.ticket_id }}"
+                data-name="{{ data.ticket_name }}"
+                data-type="{{ data.type }}"
+                data-creator="{{ data.creator.name }}"
+                data-project="{{ data.project }}"
+                data-process-data="{{ data.process_data }}"
+                data-uploads="{{ data.uploads }}"
+                data-permissions="{{ data.permissions }}"
+                data-visibility="{{ data.visibility }}"
+                data-category="{{ data.category }}">
+                VIEW
+                </button>
+            </td>
+
+            <td class="centered">{{ data.creator.name }}</td>
+
+            <td>
+                <button type="button" class="btn-table delete-btn"
+                data-db-id="{{ data.id }}"
+                data-permissions="{{ data.permissions }}">
+                DELETE
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

@@ -1,0 +1,9 @@
+__pycache__/
+process.py
+ticketbase.db
+static/kanban.css
+uploads/
+static/js/process_script.js
+templates/_process_table.html
+.env
+instance/

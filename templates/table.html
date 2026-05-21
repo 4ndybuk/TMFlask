@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Tickets</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='tablestyle.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='modal.css') }}">
+    <meta name="update-csrf-token" content="{{ update_form.csrf_token._value() }}">
+    <meta name="upload-csrf-token" content="{{ upload_form.csrf_token._value() }}">
+    <meta name="stage-csrf-token" content="{{ process_form.csrf_token._value() }}">
+</head>
+
+<body>
+    <p><b>>> Current User: </b>{{ username.name }} ({{ username.username }})</p>
+    <button class="btn-table" type="button" id="add-ticket-btn">ADD TICKET</button>
+    <button id="refreshButton" "type=" button" class="btn-table">REFRESH</button>
+    <button class="btn-table" type="button" id="filterButton">FILTERS</button>
+    <button class="btn-table" type="button" id="resetButton">RESET FILTERS</button>
+    <span style="border-left: 1px solid #ccc; margin: 0 10px;"></span>
+    <a href="/logout" type="button" class="btn-table" id="logoutButton">LOGOUT</a>
+
+
+    <!-- Display modal for ticket creation -->
+    <div id="createModal" class="modal-overlay">
+        <div class="modal">
+            <h2>CREATE TICKET</h2>
+            {% include "_ticket_form.html" %}
+            <button class="btn-login" type="button" id="close-ticket-btn">CLOSE</button>
+        </div>
+    </div>
+
+    <!-- Display Modal for staged ticket creation -->
+    <div id="createJSModal" class="modal-overlay">
+        <div class="modal">
+            <h2>CREATE STAGED TICKET</h2>
+            <div id="stageTicketContainer"></div>
+        </div>
+    </div>
+
+    <!-- Simple ticket view modal -->
+    <div id="viewModal" class="modal-overlay">
+        <div class="modal">
+            <h2>TICKET #<span id="viewTicketId"></span></h2>
+            <input type="hidden" id="viewDbId" value="">
+            <p><strong>Title: </strong><span id="viewTitle"></span></p>
+            <p><strong>Created by: </strong><span id="viewCreator"></span></p>
+            <p><strong>Permissions: </strong><button type="button" id="permissionBtn">ACCESS</button></p>
+            <p><strong>Project : </strong><span id="viewProject"></span></p>
+            <p><strong>Uploads: </strong></p>
+            <form id="uploadFileForm" enctype="multipart/form-data">
+                {{ upload_form.hidden_tag() }}
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    {{ upload_form.file }}
+                    <button type="button" class="btn-login" id="upload-file-btn">UPLOAD</button>
+                </div>
+            </form>
+            <br>
+            <div id="uploadContainer"></div>
+            <p><strong>History: </strong></p>
+            <div id="historyContainer"></div>
+            <form id="updateHistoryForm">
+                {{ update_form.hidden_tag () }}
+                {{ update_form.update(id="historyInput", placeholder="Add new entry...") }}
+                <div style="display: block; align-items: center; gap: 10px;">
+                    <button type="button" class="btn-login" id="save-history-btn">SAVE</button>
+                </div>
+            </form>
+            <br>
+            <button type="button" class="btn-login" id="close-view-modal">CLOSE</button>
+            <button type="button" class="btn-login" id="archive-view-modal">ARCHIVE</button>
+        </div>
+    </div>
+
+    <!-- Permissions Modal -->
+    <div id="permissionsModal" class="modal-overlay"></div>
+
+    <!-- Process ticket view modal -->
+    <div id="processModal" class="modal-overlay">
+        <div class="modal-process">
+            {% include "_process_table.html" %}
+        </div>
+    </div>
+
+    <br>
+    <!-- Category tabs with ticket tables -->
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="tab1">GENERAL</button>
+            <button class="tab-btn" data-tab="tab2">SAFETY</button>
+            <button class="tab-btn" data-tab="tab3">STOCK</button>
+            <button class="tab-btn" data-tab="tab4">STORAGE</button>
+            <button class="tab-btn" data-tab="tab5">ARCHIVED</button>
+        </div>
+
+        <div id="tab1" class="tab-content active">
+            {% set tickets = general %}
+            {% include "_ticket_table.html" %}
+        </div>
+
+        <div id="tab2" class="tab-content">
+            {% set tickets = safety %}
+            {% include "_ticket_table.html" %}
+        </div>
+
+        <div id="tab3" class="tab-content">
+            {% set tickets = stock %}
+            {% include "_ticket_table.html" %}
+        </div>
+
+        <div id="tab4" class="tab-content">
+            {% set tickets = storage %}
+            {% include "_ticket_table.html" %}
+        </div>
+
+        <div id="tab5" class="tab-content">
+            {% set tickets = archived %}
+            {% include "_ticket_table.html" %}
+        </div>
+
+    </div>
+    <script type="module" src="{{ url_for('static', filename='js/table_script.js') }}"></script>
+</body>
+
+</html>

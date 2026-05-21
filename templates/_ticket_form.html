@@ -1,0 +1,65 @@
+<form action="/add" method="POST" id="createTicketForm">
+    {{ form.hidden_tag() }}
+
+    <div class="input-modal">
+        {{ form.category.label }}
+        {{ form.category }}
+    </div>
+
+    <label class="input-modal">
+        <p>
+            <b>Understanding Ticket Type:</b><br>
+            <b>Simple: </b>single ticket with no branching<br>
+            <b>Process: </b>currently in development!
+        </p>
+    </label>
+
+    <div class="radio-modal">
+        {{ form.type.label }}
+        {% for subfield in form.type %}
+            <label class="radio-option {% if loop.index == 2 %}disabled{% endif %}">
+                {{ subfield(disabled=(subfield.data == 'Process')) }}
+                {{ subfield.label.text }}
+            </label>
+        {% endfor %}
+    </div>
+
+    <div class="radio-modal">
+        {{ form.visibility.label }}
+        {% for subfield in form.visibility %}
+            <label class="radio-option">
+                {{ subfield }}
+                {{ subfield.label.text }}
+            </label>
+        {% endfor %}
+    </div>
+
+    <div class="input-modal">
+        {{ form.name.label }}
+        {{ form.name }}
+    </div>
+
+    <div class="input-modal">
+        {{ form.urgency.label }}
+        {{ form.urgency }}
+    </div>
+
+    <div class="input-modal">
+        {{ form.project.label }}
+        {{ form.project }}
+    </div>
+
+    <div class="input-modal">
+        {{ form.location.label }}
+        {{ form.location }}
+    </div>
+
+    <div class="input-modal">
+        {{ form.history.label }}
+        {{ form.history }}
+    </div>
+
+    <div class="btn-modal">
+        {{ form.submit(class="btn-login") }}
+    </div>
+</form>

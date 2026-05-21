@@ -1,0 +1,26 @@
+{% extends "home.html" %}
+
+{% block content %}
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        {% if error %}
+            <p style="color: red;">{{ error }}</p>
+        {% endif %}
+
+        <div class="input-group">
+            {{ form.username.label }}
+            {{ form.username(class="input") }}
+        </div>
+
+        <div class="input-group">
+            {{ form.password.label }}
+            {{ form.password(class="input") }}
+        </div>
+
+        <div class="btn-container">
+            {{ form.submit(class="btn-login") }}
+            <a href="/" type="button" class="btn-login">BACK</a>
+        </div>
+    </form>
+{% endblock %}

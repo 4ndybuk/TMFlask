@@ -1,0 +1,236 @@
+* {
+    font-family: 'Fira Code', monospace;;
+}
+.input-modal {
+    display: flex;
+    margin-bottom: 18px;
+    align-items: center;
+    gap: 12px;
+}
+
+.input-modal label {
+    margin-bottom: 1px;
+    width: 200px;
+    font-size: 14px;
+    color: #374151;
+}
+
+.input-modal p {
+    font-size: 12px;
+    padding-left: 18%;
+    text-align: left;
+}
+
+.input-modal input,
+.input-modal select,
+.input-modal textarea {
+    flex: 1;
+    width: 92%;
+    padding: 12px 14px;
+    font-size: 15px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input-modal input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.btn-modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin: 20px auto;
+    width: 27%;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal {
+    background: #fff;
+    padding: 30px;
+    min-width: 400px;
+    max-width: 800px;
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, .3);
+    animation: pop .2s ease;
+    text-align: center;
+    max-height: 90vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.modal-process {
+    background: #fff;
+    padding: 30px;
+    min-width: 400px;
+    max-width: 800px;
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, .3);
+    animation: pop .2s ease;
+    text-align: center;
+    max-height: 90vh;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
+.btn-active {
+    width: 100%;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    color: #ffffff;
+    background-color: #03b518;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.05s ease;
+}
+
+.btn-inactive {
+    width: 100%;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    color: #ffffff;
+    background-color: #374151;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.05s ease;
+}
+
+p {
+    text-align: left;
+}
+
+.history-block {
+    text-align: left;
+    color: #000000;
+    border-radius: 5px;
+    padding: 10px 10px;
+}
+
+.radio-modal {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 6px;
+    padding: 12px 49px;
+    width: 100%;
+    font-size: 14px;
+    color: #374151;
+}
+
+label.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    padding-left: 11%;
+    gap: 5px;
+}
+
+.stage-row,
+.ticket-row {
+    display: flex;
+    gap: 20px;
+}
+
+.stage-column {
+    min-width: 250px;
+    background: #f4f4f4;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.ticket-card {
+    background: white;
+    padding: 8px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.stage-pill {
+    padding: 6px 14px;
+    border-radius: 999px;
+    /* Makes it pill-shaped */
+    border: 1px solid #ccc;
+    outline: none;
+    font-size: 14px;
+    width: 120px;
+    /* Keeps it compact */
+    text-align: center;
+    transition: all 0.2s ease;
+    background-color: #f7f7f7;
+}
+
+/* Focus effect */
+.stage-pill:focus {
+    border-color: #4a90e2;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+/* Placeholder styling */
+.stage-pill::placeholder {
+    color: #999;
+    font-style: italic;
+}
+
+/* Optional: slight hover effect */
+.stage-pill:hover {
+    border-color: #888;
+}
+
+#uploadContainer {
+    overflow-y: auto;
+}
+
+#historyInput {
+    font-size: 12px;
+    width: 95%;
+    height: 80px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    resize: none;
+    padding: 10px 10px;
+    border-radius: 5px;
+}
+
+@keyframes pop {
+    from {
+        transform: scale(.9);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
