@@ -1,4 +1,6 @@
 __pycache__/
+*.pyc
+*.pyo
 process.py
 ticketbase.db
 static/kanban.css
