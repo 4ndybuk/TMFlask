@@ -46,14 +46,7 @@ def ticket():
                      creator=current_user,
                      permissions=json.dumps(initial_perms),
                      visibility=form.visibility.data)
-        
-    # # Database submission for staged tickets
-    # elif request.get_json():
-    #     staged_ticket = request.get_json()
-    #     t = Database(ticket_name=staged_ticket["ticketName"],ticket_id=generate_id(),
-    #                  urg=staged_ticket["urgency"],stage=staged_ticket["stage_index"],
-    #                  location=staged_ticket["location"],status="Active",
-    #                  history=staged_ticket["history"],parent_id=staged_ticket["parent_id"])
+
     else:
         flash("Ticket has not been successfully added", "fail")
         return redirect(url_for('table.table'))
@@ -90,7 +83,7 @@ def add_update(id):
             return jsonify({'success': False}), 400
         check_user = User.query.filter_by(username=new_perms).first()
         if check_user:
-            if not add_data['allowed_role'].isdigit() and len(add_data['allowed_role']) == 5: 
+            if not add_data['allowed_role'].isdigit() and len(add_data['allowed_role']) <= 5:
                 perm_list = json.loads(ticket.permissions or "[]")
                 perm_list.append({
                     "allowed_name": check_user.name,
@@ -192,11 +185,23 @@ def erase(id):
     flash("Ticket Deleted", "info")
     return jsonify({"success": True})
 
-# Get history dynamically
-@tickets.route('/grab_history/<int:id>', methods=['GET'])
+# Get history and uploads dynamically
+@tickets.route('/grab_data/<int:id>', methods=['GET'])
 @login_required
 def grab_history(id):
     ticket = Database.query.get_or_404(id)
     if not ticket:
-        return jsonify({'history': "", 'error': 'Ticket not found'})
-    return jsonify({'history': ticket.history})
+        return jsonify({'history': "",
+        'uploads': "",
+        'error': 'Ticket not found'})
+    return jsonify({'history': ticket.history,
+    'uploads': ticket.uploads})
+
+@tickets.route('/grab_permissions/<int:id>', methods=['GET'])
+@login_required
+def grab_permissions(id):
+    ticket = Database.query.get_or_404(id)
+    if not ticket:
+        return jsonify({'permissions': "",
+        'error': 'Ticket not found'})
+    return jsonify({'permissions': ticket.permissions})

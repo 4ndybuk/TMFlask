@@ -1,5 +1,4 @@
 import { openPermissions } from "./permissions_script.js";
-
 // Opening a modal with retrieved information and History and File Upload inputs
 export function openViewModal(data) {
 
@@ -42,31 +41,36 @@ export function openViewModal(data) {
                     document.getElementById("viewProject").innerText = project;
 
                     const permissionButton = document.getElementById("permissionBtn");
+
+                    const newButton = permissionButton.cloneNode(true);
+                    permissionButton.parentNode.replaceChild(newButton, permissionButton);
                     // Permissions button
                     if (visibility == "Private") {
-                        permissionButton.classList.add("btn-login");
-                        permissionButton.style.padding = "5px";
-                        permissionButton.addEventListener("click", () => openPermissions(permissions, csrfStageToken, dbId));
-                    } else {
-                        permissionButton.innerText = "Everyone"
-                        permissionButton.style.color = "grey"
-                        permissionButton.classList.remove("btn-login");
+                        newButton.classList.add("btn-login");
+                        newButton.style.padding = "5px";
+                        newButton.addEventListener("click", () => openPermissions(csrfStageToken, dbId));
+                    }
+                    if (visibility == "Everyone") {
+                        newButton.innerText = "Everyone"
+                        newButton.style.color = "grey"
+                        newButton.classList.remove("btn-login");
                     }
 
-                    function fetchAndRenderHistory(dbId, csrfStageToken, container) {
-                        fetch(`/grab_history/${dbId}`, {
+                    function fetchAndRender(dbId, token, hist_container, upl_container) {
+                        fetch(`/grab_data/${dbId}`, {
                             method: 'GET',
                             credentials: 'same-origin',
                             headers: {
-                                'X-CSRFToken': csrfStageToken
+                                'X-CSRFToken': token
                             }
                         })
                             .then(response => response.json())
                             .then(data => {
                                 const history = typeof data.history === "string" ? JSON.parse(data.history) : data.history
+                                const uploads = typeof data.uploads === "string" ? JSON.parse(data.uploads) : data.uploads;
                                 // Uploading history inputs to the container
                                 if (history) {
-                                    container.innerHTML = "";
+                                    hist_container.innerHTML = "";
                                     history.forEach(entry => {
                                         const initialBlock = document.createElement("div");
                                         initialBlock.classList.add("history-block");
@@ -75,32 +79,33 @@ export function openViewModal(data) {
                                         initialBlock.style.padding = "8px";
                                         initialBlock.style.marginBottom = "4px";
                                         initialBlock.style.whiteSpace = "pre-wrap";
-                                        container.appendChild(initialBlock);
+                                        hist_container.appendChild(initialBlock);
                                     });
-                                }
+                                };
+                                if (uploads) {
+                                    upl_container.innerHTML = "";
+                                    uploads.forEach(file => {
+                                        const link = document.createElement("a");
+                                        link.href = "/" + encodeURIComponent(file.path);
+                                        link.innerText = file.filename;
+                                        link.target = "_blank";
+                                        upl_container.appendChild(link);
+                                        upl_container.appendChild(document.createElement("br"));
+                                    });
+                                };
                             })
                             .catch(error => console.error("History fetch error:", error));
                     }
 
                     // Create a display container for history
-                    const container = document.getElementById("historyContainer");
-                    container.innerHTML = ""; // clear old content
-
-                    fetchAndRenderHistory(dbId, csrfStageToken, container);
+                    const hist_container = document.getElementById("historyContainer");
+                    hist_container.innerHTML = ""; // clear old content
 
                     // Display container for file uploads
                     const upl_container = document.getElementById("uploadContainer");
                     upl_container.innerHTML = "";
 
-                    // Appending file links to the upload container
-                    uploads.forEach(file => {
-                        const link = document.createElement("a");
-                        link.href = "/" + encodeURIComponent(file.path);
-                        link.innerText = file.filename;
-                        link.target = "_blank";
-                        upl_container.appendChild(link);
-                        upl_container.appendChild(document.createElement("br"));
-                    });
+                    fetchAndRender(dbId, csrfStageToken, hist_container, upl_container);
 
                     document.getElementById("historyInput").value = ""; // clear input for new updates
 

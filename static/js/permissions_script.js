@@ -1,5 +1,5 @@
 // Function to adjust user permissions to access the ticket
-export function openPermissions(permissions, token, id) {
+export function openPermissions(token, id) {
     const outer = document.getElementById("permissionsModal");
     outer.classList.add("active")
 
@@ -16,18 +16,44 @@ export function openPermissions(permissions, token, id) {
     heading.textContent = "Allowed Users:"
     inner.appendChild(heading);
 
-    if (permissions) {
-        const seen = new Set();
-        permissions.forEach(entry => {
-            const key = `${entry.allowed_name}-${entry.allowed_user}`;
-            if (seen.has(key)) return;
-            seen.add(key);
+    const innerNames = document.createElement("div");
+    innerNames.style.borderRadius = "10px";
+    innerNames.style.padding = "10px 10px";
+    innerNames.style.backgroundColor = "#f0f0f0";
+    inner.appendChild(innerNames);
 
-            const line = document.createElement("p");
-            line.innerHTML = `★ ${entry.allowed_name} → ${entry.allowed_user} (${entry.allowed_role})`;
-            inner.appendChild(line);
+    // Declare permissions outside of fetch for further use
+    let fetchPerms;
+
+    // Fetch permissions dynamically
+    fetch(`/grab_permissions/${id}`, {
+        method: 'GET',
+        credentials: 'same-origin',
+        headers: {
+            'X-CSRFToken': token
+        }
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.permissions) {
+                alert("Error in fetching ticket permissions");
+                return;
+            } else {
+                fetchPerms = JSON.parse(data.permissions) || "[]"
+                if (fetchPerms) {
+                    const seen = new Set();
+                    fetchPerms.forEach(entry => {
+                        const key = `${entry.allowed_name}-${entry.allowed_user}`;
+                        if (seen.has(key)) return;
+                        seen.add(key);
+
+                        const line = document.createElement("p");
+                        line.innerHTML = `★ ${entry.allowed_name} → ${entry.allowed_user} (${entry.allowed_role})`;
+                        innerNames.appendChild(line);
+                    });
+                };
+            }
         });
-    };
 
     inner.appendChild(document.createElement("br"));
     const label = document.createElement("label");
@@ -50,7 +76,7 @@ export function openPermissions(permissions, token, id) {
     add.type = "button";
     add.innerText = "ADD USER";
     add.classList.add("btn-login");
-    add.style.margin = "15px";
+    add.style.margin = "10px";
     add.addEventListener("click", function () {
 
         // Verify user first
@@ -89,9 +115,16 @@ export function openPermissions(permissions, token, id) {
                     .then(data => {
                         if (!data.success) {
                             alert("Failed to save update!");
+                            console.error('Request failed:', data);
                         } else {
-                            permissions.push(permi_load);
-                            openPermissions(permissions, token, id);
+                            if (fetchPerms.some(entry => entry.allowed_user === permi_load.allowed_user)) {
+                                alert("The user has already been added!")
+                            } else {
+                                const new_line = document.createElement("p");
+                                new_line.innerHTML = `★ ${permi_load.allowed_name} → ${permi_load.allowed_user} (${permi_load.allowed_role})`;
+                                innerNames.appendChild(new_line);
+                                input.value = "";
+                            }
                         }
                     })
                     .catch(error => console.error("Error:", error));

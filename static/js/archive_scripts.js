@@ -14,11 +14,14 @@ export function archiveTicket() {
         })
         .then(response => response.json())
         .then(data => {
-            if (!data.success) {alert("Failed to archive the ticket!")} 
+            if (!data.success) {
+            	alert("Failed to archive the ticket!")
+            } else {
+            	document.getElementById("viewModal").classList.remove("active")
+            	location.reload()
+            } 
         })
         .catch(error => console.log("Error:", error));
-        document.getElementById("viewModal").classList.remove("active")
-        location.reload()
     } else {
         return; 
     }

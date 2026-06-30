@@ -29,9 +29,15 @@
                     {% if data.category == "Archived" %}
                         <button disabled class="status-btn" style="color: grey;">DISABLED</button>
                     {% elif data.status == "Active" %}
-                        {{ status_form.change_status(class_="status-btn btn-active", data_db_id=data.id, data_status=data.status, value=data.status) }}
+                        {{ status_form.change_status(class_="status-btn btn-active", data_db_id=data.id, 
+                        data_permissions=data.permissions,
+                        data_status=data.status, 
+                        value=data.status) }}
                     {% else %}
-                        {{ status_form.change_status(class_="status-btn btn-inactive", data_db_id=data.id, data_status=data.status, value=data.status) }}
+                        {{ status_form.change_status(class_="status-btn btn-inactive", data_db_id=data.id, 
+                        data_permissions=data.permissions, 
+                        data_status=data.status, 
+                        value=data.status) }}
                     {% endif %}
                 </form>
             </td>

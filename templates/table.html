@@ -2,6 +2,18 @@
 <html>
 
 <head>
+    <style>
+        body {
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)),
+                url('/static/images/wallpaper.webp');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100hv;
+        }
+    </style>
     <title>Tickets</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,13 +28,14 @@
 
 <body>
     <p><b>>> Current User: </b>{{ username.name }} ({{ username.username }})</p>
-    <button class="btn-table" type="button" id="add-ticket-btn">ADD TICKET</button>
-    <button id="refreshButton" "type=" button" class="btn-table">REFRESH</button>
-    <button class="btn-table" type="button" id="filterButton">FILTERS</button>
-    <button class="btn-table" type="button" id="resetButton">RESET FILTERS</button>
-    <span style="border-left: 1px solid #ccc; margin: 0 10px;"></span>
-    <a href="/logout" type="button" class="btn-table" id="logoutButton">LOGOUT</a>
-
+    <div class="sidebar">
+        <button class="btn-table" type="button" id="add-ticket-btn">ADD TICKET</button>
+        <button id="refreshButton" "type=" button" class="btn-table">REFRESH</button>
+        <button class="btn-table" type="button" id="filterButton">FILTERS</button>
+        <button class="btn-table" type="button" id="resetButton">RESET FILTERS</button>
+        <span style="border-left: 1px solid #ccc; margin: 0 12px;"></span>
+        <a href="/logout" type="button" class="btn-table" id="logoutButton">LOGOUT</a>
+    </div>
 
     <!-- Display modal for ticket creation -->
     <div id="createModal" class="modal-overlay">

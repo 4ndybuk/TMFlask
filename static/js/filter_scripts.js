@@ -6,7 +6,7 @@ export function ticketFilters(attatch) {
     currentPayload = null;
 
     const token = document.querySelector('input[name="csrf_token"]').value;
-    
+
     const modal = document.createElement('div');
     const container = document.createElement('div');
     modal.classList.add("modal-overlay");
@@ -47,6 +47,7 @@ export function ticketFilters(attatch) {
     locationLabel.innerHTML = "Location: "
     const locationInput = document.createElement("input");
     locationInput.type = "text";
+    locationInput.placeholder = "e.g. G12"
 
     const projectLabel = document.createElement('label');
     projectLabel.innerHTML = "Project: ";
@@ -71,7 +72,7 @@ export function ticketFilters(attatch) {
             ticketId: idInput.value === "" ? null : idInput.value,
             username: creatorInput.value === "" ? null : creatorInput.value,
             urgency: urgencySelect.value === "None" ? null : urgencySelect.value,
-            location: locationInput.value === "" ? null : creatorInput.value,
+            location: locationInput.value === "" ? null : locationInput.value,
             project: projectSelect.value === "None" ? null : projectSelect.value
         }
         fetch("/table", {
@@ -82,12 +83,22 @@ export function ticketFilters(attatch) {
             },
             body: JSON.stringify(currentPayload)
         })
-            .then(response => response.text())
+            .then(response => {
+                // Check if redirected to login (usually 401 or redirect)
+                console.log('Status:', response.status);
+                console.log('Redirected:', response.redirected);
+                return response.text();
+            })
             .then(html => {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
                 document.querySelector('.tabs').innerHTML = doc.querySelector('.tabs').innerHTML;
                 attatch();
+                const savedTab = localStorage.getItem("activeTab");
+                if (savedTab) {
+                    const btn = document.querySelector(`[data-tab="${savedTab}"]`);
+                    if (btn) btn.click();
+                }
             })
             .catch(error => console.log("Error:", error))
         modal.classList.remove("active");

@@ -1,4 +1,5 @@
 # Generate and filter table
+import sys
 from flask import Blueprint, request, render_template, jsonify
 from flask_login import login_required, current_user
 from flaskforms import TicketForm, UpdateForm, UploadForm, StatusForm, ProcessForm
@@ -25,14 +26,14 @@ def table():
         data = request.get_json()
 
         if data:
-            ticket_id = data.get('ticketId').strip()
-            urg = data.get('urgency').strip()
-            location = data.get('location').strip()
-            project = data.get('project').strip()
+            ticket_id = (val := data.get('ticketId')) and val.strip() or None
+            urg = (val := data.get('urgency')) and val.strip() or None
+            location = (val := data.get('location')) and val.strip() or None
+            project = (val := data.get('project')) and val.strip() or None
             
             # Validating expected input data before filtering
             if ticket_id:
-                if len(ticket_id) != 6 or not ticket_id.isdigit():
+                if len(ticket_id) > 6 or not ticket_id.isdigit():
                     return jsonify({'success': False}), 400
                 filters['ticket_id'] = ticket_id
             if urg:
@@ -50,6 +51,8 @@ def table():
                 if project not in projects:
                     return jsonify({'success': False}), 400
                 filters['project'] = project    
+        else:
+            filters = {}
 
     # Tab-specific filtered tables
     general = Database.query.filter_by(category="General", **filters).all()

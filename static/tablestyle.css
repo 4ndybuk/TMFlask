@@ -22,6 +22,12 @@ button {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
 }
 
+.sidebar {
+    background-color: rgba(224, 224, 224, 0.7);
+    border-radius: 4px;
+    width: 50.3%;
+}
+
 .table-modern thead {
     background-color: #b2d0ee;
 }

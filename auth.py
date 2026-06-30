@@ -1,5 +1,5 @@
 import os
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, session, request
 from flaskforms import LoginForm, RegisterForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, current_user, logout_user
@@ -10,12 +10,7 @@ from models import User, db
 auth = Blueprint('auth', __name__)
 
 # Valid access codes for registration
-VALID_ACCESS_CODES = os.environ.get('ACCESS_CODES').split(',')
-
-# Load user for Flask-Login
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+VALID_ACCESS_CODES = os.environ.get('ACCESS_CODES', '').split(',')
 
 # Index page (Login)
 @auth.route('/login', methods=['GET', 'POST'])
@@ -38,7 +33,10 @@ def login():
 @auth.route('/register', methods=['GET', 'POST'])
 @limiter.limit("5 per minute")
 def register():
+    print("SESSION AT REGISTER:", dict(session))
+    print("METHOD:", request.method)
     form = RegisterForm()
+    print("CSRF TOKEN IN FORM:", form.csrf_token.data)
     if form.validate_on_submit():
         # Check existing username
         if User.query.filter_by(username=form.username.data).first():

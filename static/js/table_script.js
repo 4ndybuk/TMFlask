@@ -12,43 +12,64 @@ function attatchTableListeners() {
             // extract ID and status
             const button = event.target;
             const dbId = button.dataset.dbId;
+            const perms = JSON.parse(button.dataset.permissions) || "[]"
             let status = button.dataset.status;
-
-            // Toggling status locally
-            const newStatus = status === "Active" ? "Completed" : "Active";
-
-            // Update UI instantly
-            button.dataset.status = newStatus;
-            button.value = newStatus;
-
-            // Update CSS class based on newStatus
-            if (newStatus === "Active") {
-                button.classList.add("btn-active");
-                button.classList.remove("btn-inactive");
-            } else {
-                button.classList.add("btn-inactive");
-                button.classList.remove("btn-active");
-            }
 
             // Retrieve CSRF token
             const csrf = button.closest("form").querySelector('input[name="csrf_token"]').value;
 
-            // Send to backend for database udpate
-            fetch(`/update_status/${dbId}`, {
-                method: 'POST',
+            fetch("/confirm_user", {
+                method: 'GET',
                 credentials: 'same-origin',
                 headers: {
-                    'Content-Type': 'application/json',
                     'X-CSRFToken': csrf
-                },
-                body: JSON.stringify({ status: newStatus })
+                }
             })
                 .then(response => response.json())
                 .then(data => {
-                    if (!data.success) { alert("Database update failed!"); }
-                })
-                .catch(error => console.error("Error:", error));
-        });
+                    if (!data.logged_user) {
+                        alert("Error in fetching logged user!");
+                        return;
+                    } else {
+                        const loggedUser = data.logged_user;
+                        if (perms.some(entry => entry.allowed_user === loggedUser)) {
+                            // Toggling status locally
+                            const newStatus = status === "Active" ? "Completed" : "Active";
+
+                            // Update UI instantly
+                            button.dataset.status = newStatus;
+                            button.value = newStatus;
+
+                            // Update CSS class based on newStatus
+                            if (newStatus === "Active") {
+                                button.classList.add("btn-active");
+                                button.classList.remove("btn-inactive");
+                            } else {
+                                button.classList.add("btn-inactive");
+                                button.classList.remove("btn-active");
+                            }
+
+                            // Send to backend for database udpate
+                            fetch(`/update_status/${dbId}`, {
+                                method: 'POST',
+                                credentials: 'same-origin',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRFToken': csrf
+                                },
+                                body: JSON.stringify({ status: newStatus })
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (!data.success) { alert("Database update failed!"); }
+                                })
+                                .catch(error => console.error("Error:", error));
+                        } else {
+                            alert("You don't have permissions to change the status!")
+                        }
+                    }    
+                });
+    });
     });
 
     // All View buttons for the ticket history with information
@@ -73,15 +94,16 @@ function attatchTableListeners() {
             openTab(event, btn.dataset.tab)
         });
     });
-}
 
-document.addEventListener("DOMContentLoaded", function () {
     // Restoring last tab on page reload
     const savedTab = localStorage.getItem("activeTab");
     if (savedTab) {
         const btn = document.querySelector(`[data-tab="${savedTab}"]`);
         if (btn) btn.click();
-    }
+    };
+};
+
+document.addEventListener("DOMContentLoaded", function () {
     attatchTableListeners();
 });
 
@@ -120,21 +142,9 @@ import { archiveTicket } from "./archive_scripts.js";
 const archiveButton = document.getElementById("archive-view-modal");
 archiveButton.addEventListener("click", archiveTicket)
 
-// Filter button
-import { ticketFilters, getPayload } from "./filter_scripts.js";
-document.getElementById("filterButton").addEventListener("click", () => ticketFilters(attatchTableListeners));
-const resetButton = document.getElementById("resetButton");
-resetButton.style.minWidth = "150px";
-resetButton.addEventListener("click", () => {
-    window.location.reload();
-});
-
-document.getElementById('logoutButton').style.color = "red";
-document.getElementById('add-ticket-btn').style.color = "#0310cb";
-
-// Refresh button
-document.getElementById("refreshButton").addEventListener("click", () => {
-    const payload = getPayload()
+// Refresh function
+function refreshReset(condition) {
+    const payload = condition === "reset" ? null : getPayload()
     const token = document.querySelector('input[name="csrf_token"]').value;
     fetch("/table", {
         method: 'POST',
@@ -145,12 +155,39 @@ document.getElementById("refreshButton").addEventListener("click", () => {
         },
         body: JSON.stringify(payload)
     })
-        .then(response => response.text())
+        .then(response => {
+                // Check if redirected to login (usually 401 or redirect)
+                console.log('Status:', response.status);
+                console.log('Redirected:', response.redirected);
+                return response.text();
+        })
         .then(html => {
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             document.querySelector('.tabs').innerHTML = doc.querySelector('.tabs').innerHTML;
             attatchTableListeners();
+            const savedTab = localStorage.getItem("activeTab");
+            if (savedTab) {
+                const btn = document.querySelector(`[data-tab="${savedTab}"]`);
+                if (btn) btn.click();
+            }
         })
         .catch(error => console.log("Error:", error))
+}
+
+// Filter button
+import { ticketFilters, getPayload } from "./filter_scripts.js";
+document.getElementById("filterButton").addEventListener("click", () => ticketFilters(attatchTableListeners));
+const resetButton = document.getElementById("resetButton");
+resetButton.style.minWidth = "150px";
+resetButton.addEventListener("click", () => {
+    refreshReset("reset");
+});
+
+document.getElementById('logoutButton').style.color = "red";
+document.getElementById('add-ticket-btn').style.color = "#0310cb";
+
+// Refresh button
+document.getElementById("refreshButton").addEventListener("click", () => {
+    refreshReset("refresh")
 });
