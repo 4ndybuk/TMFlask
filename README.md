@@ -31,13 +31,15 @@ Designed to support issue reporting with a structured and auditable workflow.
 5. Assign the following environmental variables in .env  
    ```bash
    SECRET_KEY=generate a key
-   FLASK_ENV=development or production
+   FLASK_DENUG=0/1 (development/production)
    ACCESS_CODES=code1,code2,...
+   MAIL=yourmail@yourdomain
    ```
    
 8. Run the site with  
    ```bash
-   python app.py
+   python app.py (if in development and debugging)
+   waitress-serve --host=0.0.0.0 --port=8000 app:app (if set for production)
    ```
 
 ## Usage
