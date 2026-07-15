@@ -1,50 +1,55 @@
 {% extends "home.html" %}
 
 {% block content %}
-    <form method="POST">
-        {{ form.hidden_tag() }}
+<form method="POST">
+    {{ form.hidden_tag() }}
 
-        {% if error %}
-            <p style="color: red;">{{ error }}</p>
-        {% endif %}
+    {% if error %}
+    <p style="color: red;">{{ error }}</p>
+    {% endif %}
 
-        <div class="input-group">
-            {{ form.name.label }}
-            {{ form.name(class="input") }}
-        </div>
+    <div class="input-group">
+        {{ form.name.label }}
+        {{ form.name(class="input") }}
+    </div>
 
-        <div class="input-group">
-            {{ form.username.label }}
-            {{ form.username(class="input") }}
-            {% for error in form.username.errors %}
-                <p style="color: red;">{{ error }}</p>
-            {% endfor %}
-        </div>
+    <div class="input-group">
+        {{ form.username.label }}
+        {{ form.username(class="input") }}
+        {% for error in form.username.errors %}
+        <p style="color: red;">{{ error }}</p>
+        {% endfor %}
+    </div>
 
-        <div class="input-group">
-            {{ form.password.label }}
-            {{ form.password(class="input") }}
-            {% for error in form.password.errors %}
-                <p style="color: red;">{{ error }}</p>
-            {% endfor %}
-        </div>
+    <div class="input-group">
+        {{ form.password.label }}
+        {{ form.password(class="input") }}
+        {% for error in form.password.errors %}
+        <p style="color: red;">{{ error }}</p>
+        {% endfor %}
+    </div>
 
-        <div class="input-group">
-            {{ form.confirm.label }}
-            {{ form.confirm(class="input") }}
-        </div>
+    <div class="input-group">
+        {{ form.confirm.label }}
+        {{ form.confirm(class="input") }}
+    </div>
 
-        <div class="input-group">
-            {{ form.access_code.label }}
-            {{ form.access_code(class="input") }}
-            {% for error in form.password.errors %}
-                <p style="color: red;">{{ error }}</p>
-            {% endfor %}
-        </div>
+    <div class="input-group">
+        {{ form.email.label }}
+        {{ form.email(class="input") }}
+    </div>
 
-        <div class="btn-container">
-            {{ form.submit(class="btn-login") }}
-            <a href="/" type="button" class="btn-login">BACK</a>
-        </div>
-    </form>
+    <div class="input-group">
+        {{ form.access_code.label }}
+        {{ form.access_code(class="input") }}
+        {% for error in form.password.errors %}
+        <p style="color: red;">{{ error }}</p>
+        {% endfor %}
+    </div>
+
+    <div class="btn-container">
+        {{ form.submit(class="btn-login") }}
+        <a href="/" type="button" class="btn-login">BACK</a>
+    </div>
+</form>
 {% endblock %}

@@ -1,4 +1,6 @@
+// set filtering payload and store locally for conditional refreshing
 let currentPayload = null;
+localStorage.setItem('payload', currentPayload);
 
 export function ticketFilters(attatch) {
     // Apply various and multiple filters to the database

@@ -2,14 +2,15 @@ import os
 import sys
 from dotenv import load_dotenv
 load_dotenv()
-from flask import Flask, render_template, session, request
+from flask import Flask, render_template, session, request, make_response
 from flask_talisman import Talisman
 from flask_mail import Mail, Message
+from flask_migrate import Migrate
 from flask_wtf import CSRFProtect
 from flask_wtf.csrf import CSRFError
 from flask_cors import CORS
 from flaskforms import *
-from extensions import limiter, login_manager
+from extensions import limiter, login_manager, mail
 from models import db, User
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -26,15 +27,32 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 # Only send cookie over HTTPS
-app.config['SESSION_COOKIE_SECURE'] = False
+app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SESSION_COOKIE_HTTPONLY'] = True  # prevent JS from accessing cookie
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax' # prevent cross-site requests
+app.config['PERMANENT_SESSION_LIFETIME'] = 3600
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024 # 100MB limit
+
+# Mailing configs
+app.config['MAIL_SERVER'] = 'hep.ph.liv.ac.uk'
+app.config['MAIL_PORT'] = 25
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USERNAME'] = None
+app.config['MAIL_PASSWORD'] = None
+app.config['MAIL_DEFAULT_SENDER'] = ("Ticket Manager - Notification", os.environ.get('MAIL'))
 
 # Forcing HTTPS redirection and automatic security headers
 talisman = Talisman(app,
-                    force_https=False,
-                    content_security_policy=False)
+                    force_https=True,
+                    content_security_policy={
+                        'default-src': "'self'",
+                        'script-src': "'self'",
+                        'style-src': "'self' 'unsafe-inline' https://fonts.googleapis.com",  # Add Google Fonts here
+                        'font-src': "'self' https://fonts.googleapis.com https://fonts.gstatic.com",
+                        'img-src': "'self' data: https:",
+                        'connect-src': "'self' https://fonts.gstatic.com",  # Also add this for font file requests
+                    })
 
 # Allow requests only from specific frontend origins
 CORS(app, origins="*")
@@ -44,10 +62,11 @@ csrf = CSRFProtect(app)
 
 # Init extensions
 db.init_app(app)
+migrate = Migrate(app, db)
 limiter.init_app(app)
 login_manager.init_app(app)
+mail.init_app(app)
 login_manager.login_view = "auth.login"
-print("Login manager initialised!")
 
 # Load user for Flask-Login
 @login_manager.user_loader
@@ -74,6 +93,14 @@ def handle_csrf_error(e):
     sys.stderr.flush()
     return f"CSRF Error: {e.description}", 400
 
+# Prevent browser from caching sensitive data
+@app.after_request
+def add_no_cache(response):
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '-1'
+    return response
+
 # Main route
 @app.route('/')
 def home():
@@ -82,4 +109,4 @@ def home():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(host='0.0.0.0', port=5000, debug=os.environ.get("FLASK_DEBUG", '0') == 1)
+   #app.run(host='0.0.0.0', port=80, debug=os.environ.get("FLASK_DEBUG", '0') == 1)

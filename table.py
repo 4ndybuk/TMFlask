@@ -24,7 +24,6 @@ def table():
     if request.method == 'POST':
         # Retrieve filtering options
         data = request.get_json()
-
         if data:
             ticket_id = (val := data.get('ticketId')) and val.strip() or None
             urg = (val := data.get('urgency')) and val.strip() or None
@@ -51,7 +50,7 @@ def table():
                 if project not in projects:
                     return jsonify({'success': False}), 400
                 filters['project'] = project    
-        else:
+        elif data is None:
             filters = {}
 
     # Tab-specific filtered tables

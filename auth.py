@@ -1,5 +1,5 @@
 import os
-from flask import Blueprint, jsonify, session, request
+from flask import Blueprint, jsonify, session, request, make_response
 from flaskforms import LoginForm, RegisterForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, current_user, logout_user
@@ -14,7 +14,7 @@ VALID_ACCESS_CODES = os.environ.get('ACCESS_CODES', '').split(',')
 
 # Index page (Login)
 @auth.route('/login', methods=['GET', 'POST'])
-@limiter.limit("8 per minute")
+@limiter.limit("12 per minute")
 def login():
     form = LoginForm()
     # Validate input form
@@ -31,7 +31,7 @@ def login():
 
 # Register account for access
 @auth.route('/register', methods=['GET', 'POST'])
-@limiter.limit("5 per minute")
+@limiter.limit("12 per minute")
 def register():
     print("SESSION AT REGISTER:", dict(session))
     print("METHOD:", request.method)
@@ -41,12 +41,17 @@ def register():
         # Check existing username
         if User.query.filter_by(username=form.username.data).first():
             return render_template("register.html", form=form, error="Username already taken!")
+        # Check exisitng email
+        if User.query.filter_by(email=form.email.data).first():
+            return render_template("register.html", form=form, error="Email already taken!")
         # Check access code for authenticity
         if form.access_code.data not in VALID_ACCESS_CODES:
             return render_template("register.html", form=form, error="Invalid access code, please try again.")
         # Encyrpt the password and store new user to the database
         hashed_password = generate_password_hash(form.password.data, method="pbkdf2:sha256", salt_length=16)
-        new_user = User(name=form.name.data, username=form.username.data, password=hashed_password)
+        new_user = User(name=form.name.data, username=form.username.data,
+        email=form.email.data,
+        password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
         # Redirect to the login page
@@ -68,7 +73,8 @@ def verify_user(username):
 @login_required
 def confirm_user():
     return jsonify({
-        'logged_user': current_user.username
+        'logged_user': current_user.username,
+        'logged_name': current_user.name
     })
 
 # Logout
@@ -76,6 +82,9 @@ def confirm_user():
 @login_required
 def logout():
     logout_user()
+    session.clear()
+    response = make_response(redirect(url_for("auth.login")))
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
     flash("Logged out", "info")
-    return redirect(url_for("auth.login"))
+    return response
 

@@ -16,11 +16,13 @@ class LoginForm(FlaskForm):
 class RegisterForm(FlaskForm):
     regex_user = Regexp(r"^[A-Za-z0-9_]+$", message="Username can contain letters, numbers, and underscores only.")
     regex_passw = Regexp(r"^(?=.*[A-Za-z])(?=.*\d).+$", message="Password must contain at least one letter and one number.")
+    regex_email = Regexp(r"^[a-zA-Z0-9._%+-]+@hep\.ph\.liv\.ac\.uk$", message="Email account must be valid")
                                                             
     name = StringField("Name", validators=[DataRequired()])
     username = StringField("Username",validators=[DataRequired(), Length(min=5, max=30), regex_user])
     password = PasswordField("Password", validators=[DataRequired(), Length(min=8, max=128),
                                                      regex_passw, EqualTo("confirm", message="Passwords must match.")])
+    email = StringField("Recovery Email", validators=[DataRequired(), regex_email])
     confirm = PasswordField("Confirm Password")
     access_code = StringField("Access Code", validators=[DataRequired(), Length(min=8, max=30)])
     submit = SubmitField("REGISTER")

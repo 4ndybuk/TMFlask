@@ -5,6 +5,8 @@ from werkzeug.utils import secure_filename
 from flaskforms import TicketForm
 from datetime import datetime
 from models import Database, db, User
+from extensions import mail
+from flask_mail import Message
 import json
 import random
 import magic
@@ -205,3 +207,32 @@ def grab_permissions(id):
         return jsonify({'permissions': "",
         'error': 'Ticket not found'})
     return jsonify({'permissions': ticket.permissions})
+
+@tickets.route('/mail_notify/<int:id>', methods=['POST'])
+@login_required
+def mail_notify(id):
+    ticket = Database.query.get_or_404(id)
+    if not ticket:
+        return jsonify({'success': False,
+                        'error': 'Ticket not found!'})
+    # Retrieve JSON data from fetch
+    response = request.get_json()
+    history = response.get('history', '').strip()
+    if not history:
+        return jsonify({'success': False,
+                        'error': 'Empty history comment.'})
+    if history:
+        permissions = json.loads(ticket.permissions or "[]")
+        allowed_users = [entry.get("allowed_user") for entry in permissions]
+        for user in allowed_users:
+            if user != current_user.username:
+                db_user = User.query.filter_by(username=user).first()
+                email = db_user.email
+                msg = Message(
+                subject=f"Ticket Manager - #{ticket.ticket_id} Update",
+                recipients=[email],
+                body=f"A new update has been added to your ticket.\n\nDetails:\n{history}"
+                )
+                mail.send(msg)
+        return jsonify({'success': True,
+                        'perms': allowed_users})

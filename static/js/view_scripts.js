@@ -44,6 +44,12 @@ export function openViewModal(data) {
 
                     const newButton = permissionButton.cloneNode(true);
                     permissionButton.parentNode.replaceChild(newButton, permissionButton);
+
+                    // Reset button state
+                    newButton.innerText = "ACCESS";
+                    newButton.style.color = "";
+                    newButton.classList.remove("btn-login");
+                    
                     // Permissions button
                     if (visibility == "Private") {
                         newButton.classList.add("btn-login");
@@ -108,6 +114,13 @@ export function openViewModal(data) {
                     fetchAndRender(dbId, csrfStageToken, hist_container, upl_container);
 
                     document.getElementById("historyInput").value = ""; // clear input for new updates
+
+                    // Reset archived-state restrictions before applying based on the new ticket
+                    document.getElementById("viewModal").style.opacity = "";
+                    document.getElementById("uploadFileForm").removeAttribute("inert");
+                    document.getElementById("updateHistoryForm").removeAttribute("inert");
+                    document.getElementById("permissionBtn").removeAttribute("inert");
+                    document.getElementById("archive-view-modal").removeAttribute("inert");
 
                     // Disable interaction for archived ticket
                     if (category === "Archived") {

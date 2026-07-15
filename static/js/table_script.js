@@ -129,7 +129,11 @@ closeView.addEventListener("click", closeViewModal);
 // Append history in view
 import { appendHistory } from "./history_scripts.js";
 const saveHistory = document.getElementById("save-history-btn");
-saveHistory.addEventListener("click", appendHistory)
+saveHistory.addEventListener("click", () => {
+    appendHistory().catch(error => {
+        alert("Failed to save the comment. Please try again.")
+    });
+});
 
 // View file upload
 import { uploadFile } from "./upload_scripts.js";
@@ -142,10 +146,22 @@ import { archiveTicket } from "./archive_scripts.js";
 const archiveButton = document.getElementById("archive-view-modal");
 archiveButton.addEventListener("click", archiveTicket)
 
+// Save current filters to storage, or clear if there are none
+function savePayload() {
+    const payload = getPayload();
+    if (payload) {
+        localStorage.setItem('payload', JSON.stringify(payload));
+    } else {
+        localStorage.removeItem('payload');
+    }
+}
+
 // Refresh function
-function refreshReset(condition) {
-    const payload = condition === "reset" ? null : getPayload()
+function refreshReset() {
     const token = document.querySelector('input[name="csrf_token"]').value;
+    const stored = localStorage.getItem('payload');
+    const payload = stored ? JSON.parse(stored) : null;
+
     fetch("/table", {
         method: 'POST',
         credentials: 'same-origin',
@@ -175,13 +191,20 @@ function refreshReset(condition) {
         .catch(error => console.log("Error:", error))
 }
 
-// Filter button
+// Filter button - apply filters, then persist them
 import { ticketFilters, getPayload } from "./filter_scripts.js";
-document.getElementById("filterButton").addEventListener("click", () => ticketFilters(attatchTableListeners));
+document.getElementById("filterButton").addEventListener("click", () => {
+    ticketFilters(() => {
+        savePayload();
+        attatchTableListeners();
+    });
+});
+
 const resetButton = document.getElementById("resetButton");
 resetButton.style.minWidth = "150px";
 resetButton.addEventListener("click", () => {
-    refreshReset("reset");
+    localStorage.removeItem('payload');
+    refreshReset();
 });
 
 document.getElementById('logoutButton').style.color = "red";
@@ -189,5 +212,5 @@ document.getElementById('add-ticket-btn').style.color = "#0310cb";
 
 // Refresh button
 document.getElementById("refreshButton").addEventListener("click", () => {
-    refreshReset("refresh")
+    refreshReset();
 });
