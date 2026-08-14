@@ -4,6 +4,8 @@ Desktop ticketing database system that supports end-to-end lifecycle ticket mana
 individual safety, stock and general workplace events through with resolution tracking between all users.
 Designed to support issue reporting with a structured and auditable workflow.
 
+Designed specifically for Linux.
+
 ## Details
 ![Flask](https://img.shields.io/badge/Flask-3.1.3-brightgreen)  
 ![License](https://img.shields.io/badge/license-NCL-blue)  
@@ -25,8 +27,7 @@ Designed to support issue reporting with a structured and auditable workflow.
    ```
 4. Create an .env file in the directory to initialise the database  
    ```bash
-   touch ./.env   (bash)
-   type nul > .env    (Windows)
+   nano ./.env
    ```
 5. Assign the following environmental variables in .env  
    ```bash
