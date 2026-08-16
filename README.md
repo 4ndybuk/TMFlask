@@ -13,6 +13,7 @@ Designed specifically for Linux.
 ## Table of Contents
 - [Installation](#installation)
 - [Usage](#usage)
+- [Images](#images)
 - [License](#license) 
 
 ## Installation
