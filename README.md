@@ -54,7 +54,7 @@ Designed specifically for Linux.
    Type=simple
    User=“your local machine username (you can check with hostname command)”
    WorkingDirectory=/directory_to_your_flask_app
-   EnvironmentFile=directory_to_your_flask_app/.env
+   EnvironmentFile=/directory_to_your_flask_app/.env
    ExecStart=/directory_to_your_flask_app/venv/bin/waitress-serve --host=0.0.0.0 --port=8000 app:app
    Restart=on-failure
    RestartSec=10
@@ -78,6 +78,7 @@ Designed specifically for Linux.
    sudo systemd start ticketmanager.service
 
    d. Check the service is running fine
+   sudo systemctl status ticketmanager
    sudo journalctl -u ticketmanager -f
    ```
 8. Install nginx for reverse proxy and handing certificates
@@ -91,15 +92,15 @@ Designed specifically for Linux.
 
    d. Paste:
    # Redirect HTTP to HTTPS
-    server {
-        listen 80;
-        listen [::]:80;
-        server_name your_server_domain;
+   server {
+       listen 80;
+       listen [::]:80;
+       server_name your_server_domain;
    
-        location / {
-            return 301 https://$host$request_uri;
-        }
-    }
+       location / {
+           return 301 https://$host$request_uri;
+       }
+   }
    
    # HTTPS with self-signed certificate
    server {
@@ -133,6 +134,8 @@ Designed specifically for Linux.
     Perform actions directly from each row:
     - Toggle ticket status between "Active" and "Completed"
     - Edit and store ticket details in View
+## Images
+<img src="static/images/example1.png" width="300">  <img src="static/images/example2.png" width="300"> <img src="static/images/example3.png" width="300">
 
 ## License
 1. This project is licensed under the Non-Commerical License - see the [LICENSE](LICENSE) file for details.
