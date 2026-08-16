@@ -135,7 +135,7 @@ Designed specifically for Linux.
     - Toggle ticket status between "Active" and "Completed"
     - Edit and store ticket details in View
 ## Images
-<img src="static/images/example1.png" width="200">  <img src="static/images/example2.png" width="200"> <img src="static/images/example3.png" width="200">
+<img src="static/images/example1.png" width="200" gap="10px">  <img src="static/images/example2.png" width="200" gap="10px"> <img src="static/images/example3.png" width="200">
 
 ## License
 1. This project is licensed under the Non-Commerical License - see the [LICENSE](LICENSE) file for details.
